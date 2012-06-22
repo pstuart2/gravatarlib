@@ -19,7 +19,6 @@
  *
  */
 
-namespace emberlabs\GravatarLib;
 use \InvalidArgumentException;
 
 /**
@@ -48,7 +47,7 @@ class Gravatar
 	/**
 	 * @var string - The maximum rating to allow for the avatar.
 	 */
-	protected $max_rating = 'g';
+	protected $max_rating = 'r';
 
 	/**
 	 * @var boolean - Should we use the secure (HTTPS) URL base?
@@ -66,6 +65,38 @@ class Gravatar
 	const HTTP_URL = 'http://www.gravatar.com/avatar/';
 	const HTTPS_URL = 'https://secure.gravatar.com/avatar/';
 	/**#@-*/
+
+	/** @access private Our singleton instance */
+	private static $_instance;
+
+	/**
+	 * The constructor. Private constructor because this is a singleton class.
+	 *
+	 * @return void
+	 *
+	 * @access private
+	 */
+	private function __construct()
+	{
+
+	}
+
+	/**
+	 * Returns the instance for this singleton class
+	 *
+	 * @return Log
+	 *
+	 * @access public
+	 */
+	public static function get()
+	{
+		if (!isset(self::$_instance))
+		{
+			$className = __CLASS__;
+			self::$_instance = new $className;
+		}
+		return self::$_instance;
+	}
 
 	/**
 	 * Get the currently set avatar size.
@@ -255,7 +286,8 @@ class Gravatar
 		{
 			// Time to figure out our request params
 			$params = array();
-			$params[] = 's=' . $this->getAvatarSize();
+			// This should be modifiable per url.
+			//$params[] = 's=' . $this->getAvatarSize();
 			$params[] = 'r=' . $this->getMaxRating();
 			if($this->getDefaultImage())
 			{
@@ -286,15 +318,5 @@ class Gravatar
 	{
 		// Using md5 as per gravatar docs.
 		return hash('md5', strtolower(trim($email)));
-	}
-
-	/**
-	 * ...Yeah, it's just an alias of buildGravatarURL.  This is just to make it easier to use as a twig asset.
-	 * @see \emberlabs\GravatarLib\Gravatar::buildGravatarURL()
-	 */
-	public function get($email, $hash_email = true)
-	{
-		// Just an alias.  Makes it easy to use this as a twig asset.
-		return $this->buildGravatarURL($email, $hash_email);
 	}
 }
